@@ -21,6 +21,7 @@
  ***************************************************************************/
 
 #include "curl_setup.h"
+#include "socketpair.h"
 
 /***********************************************************************
  * Only for threaded name resolves builds
@@ -245,7 +246,7 @@ int init_thread_sync_data(struct thread_data * td,
 
 #ifdef HAVE_SOCKETPAIR
   /* create socket pair, avoid AF_LOCAL since it doesn't build on Solaris */
-  if(socketpair(AF_UNIX, SOCK_STREAM, 0, &tsd->sock_pair[0]) < 0) {
+  if(Curl_socketpair(AF_UNIX, SOCK_STREAM, 0, &tsd->sock_pair[0]) < 0) {
     tsd->sock_pair[0] = CURL_SOCKET_BAD;
     tsd->sock_pair[1] = CURL_SOCKET_BAD;
     goto err_exit;
@@ -326,7 +327,7 @@ static unsigned int CURL_STDCALL getaddrinfo_thread(void *arg)
     if(tsd->sock_pair[1] != CURL_SOCKET_BAD) {
       /* DNS has been resolved, signal client task */
       buf[0] = 1;
-      if(write(tsd->sock_pair[1],  buf, sizeof(buf)) < 0) {
+      if(swrite(tsd->sock_pair[1],  buf, sizeof(buf)) < 0) {
         /* update sock_erro to errno */
         tsd->sock_error = SOCKERRNO;
       }
