@@ -26,7 +26,6 @@
 #ifndef HAVE_SOCKETPAIR
 int Curl_socketpair(int domain, int type, int protocol,
                     curl_socket_t socks[2]);
-#define HAVE_SOCKETPAIR /* insist */
 #else
 #define Curl_socketpair(a,b,c,d) socketpair(a,b,c,d)
 #endif
